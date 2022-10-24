@@ -130,7 +130,6 @@ public class ClientConsole implements ChatIF
       host = "localhost";
       port = DEFAULT_PORT;
     }
-    System.out.println(port);
     ClientConsole chat = new ClientConsole(host, port);
     chat.accept();  //Wait for console data
   }

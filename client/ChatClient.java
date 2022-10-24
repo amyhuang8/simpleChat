@@ -56,12 +56,143 @@ public class ChatClient extends AbstractClient {
 	 * @param message The message from the UI.    
 	 */
 	public void handleMessageFromClientUI(String message) {
-		try {
-			sendToServer(message);
+		
+		// Process: checking if message is a command
+		if (message.charAt(0) == '#') { //command
+			
+			// Process: checking length of command
+			if (message.length() > 8) {
+				
+				// Process: determining if command involves host/port
+				if (message.substring(0, 8).equals("#sethost")) { //set host command
+					
+					// Process: checking for logged off client
+					if (!isConnected()) { //not yet connected
+					
+						setHost(message.substring(9)); //setting host
+						
+					}
+					else { //already connected
+						
+						// Output
+						clientUI.display("ERROR - Client already logged in. Cannot change host name.");
+						
+					}
+					
+				}
+				else if (message.substring(0, 8).equals("#setport")) { //set port command
+					
+					// Process: checking for logged off client
+					if (!isConnected()) { //not yet connected
+					
+						setPort(Integer.parseInt(message.substring(9))); //setting port
+						
+					}
+					else { //already connected
+						
+						// Output
+						clientUI.display("ERROR - Client already logged in. Cannot change port.");
+						
+					}
+					
+				}
+				else {
+					
+					// Output
+					clientUI.display("ERROR - Invalid command.");
+					
+				}
+				
+			}
+			else {
+			
+				// Process: determining which command was entered
+				switch(message) {
+				
+					case "#quit" :
+						
+						quit(); //terminating client connection
+						
+						break;
+						
+					case "#logoff" :
+						
+						try {
+							
+							closeConnection(); //closing connection
+						
+						}
+						catch (IOException e) {}
+						
+						break;
+						
+					case "#login" :
+						
+						if (!isConnected()) { //not yet connected
+						
+							try {
+								
+								openConnection(); //opening connection
+								
+							}
+							catch (IOException e) {
+								
+								// Output
+								clientUI.display("ERROR - Cannot connect to server.");
+								
+							}
+							
+						}
+						else { //already logged in
+							
+							// Output
+							clientUI.display("ERROR - Already logged in.");
+							
+						}
+						
+						break;
+						
+					case "#gethost" :
+						
+						// Output
+						clientUI.display(getHost());
+						
+						break;
+						
+					case "#getport" :
+						
+						// Output
+						clientUI.display(String.valueOf(getPort()));
+						
+						break;
+						
+					default : //not an actual command
+						
+						// Output
+						clientUI.display("ERROR - Invalid command.");
+						
+				}
+				
+			}
+			
 		}
-		catch(IOException e) {
-			clientUI.display("Could not send message to server.  Terminating client.");
-			quit();
+		else { //not command
+			
+			// Process: sending message to server
+			try {
+				
+				sendToServer(message); //sending msg to server
+				
+			}
+			catch(IOException e) {
+				
+				// Output
+				clientUI.display("Could not send message to server.  Terminating client.");
+				
+				quit(); //terminating client connection
+				
+			}
+			
 		}
 	}
   
@@ -85,7 +216,7 @@ public class ChatClient extends AbstractClient {
 	public void connectionClosed() {
 		
 		// Output
-		clientUI.display("Server has shut down. Terminating client.");
+		clientUI.display("Client connection has been closed.");
 		
 	}
 	
@@ -100,7 +231,7 @@ public class ChatClient extends AbstractClient {
 	public void connectionException(Exception exception) {
 		
 		// Output
-		clientUI.display("ERROR - Unexpected interruption in server connection.");
+		clientUI.display("Server has shut down. Terminating client.");
 		
 		// Process: calling quit method to handle terminate client connection
 		quit();
