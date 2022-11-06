@@ -2,6 +2,8 @@
 // "Object Oriented Software Engineering" and is issued under the open-source
 // license found at www.lloseng.com 
 
+import java.io.IOException;
+
 import ocsf.server.*;
 
 /**
@@ -40,8 +42,143 @@ public class EchoServer extends AbstractServer {
 	 * @param client The connection from which the message originated.
 	 */
   	public void handleMessageFromClient(Object msg, ConnectionToClient client) {
-  		System.out.println("Message received: " + msg + " from " + client);
-  		this.sendToAllClients(msg);
+  		
+  		// Variable Declaration
+  		String message = (String) msg;
+  		
+  		// Process: checking if message is a command
+		if ((message).charAt(0) == '#') { //command
+			
+			// Process: checking length of command
+			if (message.length() > 8) {
+				
+				// Process: determining if command involves port
+				if (message.substring(0, 8).equals("#setport")) { //set port command
+					
+					// Process: checking for logged off client
+					if (!isListening() && getNumberOfClients() == 0) { //closed
+					
+						setPort(Integer.parseInt(message.substring(9))); //setting port
+						
+					}
+					else { //open server
+						
+						// Output
+						System.out.println("ERROR - Server is open. Cannot change port.");
+						
+					}
+					
+				}
+				else {
+					
+					// Output
+					System.out.println("ERROR - Invalid command.");
+					
+				}
+				
+			}
+			else {
+			
+				// Process: determining which command was entered
+				switch(message) {
+				
+					case "#quit" :
+						
+						try {
+							
+							close(); //closing server & disconnecting all clients
+							
+						}
+						catch (IOException ioe) {
+
+							// Output
+							System.out.println("Could not close server.");
+							
+						}
+						
+						break;
+						
+					case "#stop" :
+						
+						stopListening(); //stop listening
+						
+						// Output
+						serverStopped(); //stopping new connections
+						
+						break;
+						
+					case "#close" :
+						
+						stopListening(); //stop listening
+						
+						// Output
+						serverStopped(); //stopping new connections
+						
+						try {
+							
+							close(); //closing server & disconnecting all clients
+							
+						}
+						catch (IOException ioe) {
+
+							// Output
+							System.out.println("Could not close server.");
+							
+						}
+						
+						break;
+						
+					case "#start" :
+						
+						if (isListening()) { //already listening
+							
+							// Output
+							System.out.println("ERROR - Already listening for clients.");
+							
+						}
+						else {
+							
+							try {
+								
+								listen(); //start listening
+								
+							}
+							catch (IOException e) {
+
+								// Output
+								System.out.println("Could not listen for clients");
+								
+							}
+							
+						}
+						
+					case "#getport" :
+						
+						// Output
+						System.out.println(getPort());
+						
+						break;
+						
+					default : //not an actual command
+						
+						// Output
+						System.out.println("ERROR - Invalid command.");
+						
+				}
+				
+			}
+			
+		}
+		else { //not command
+			
+			// Output
+			System.out.println("Message received: " + msg + " from " + client);
+	  		
+			// Process: sending message to server
+			this.sendToAllClients(msg);
+			
+		}
+	
   	}
     
   	/**
