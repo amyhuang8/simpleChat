@@ -4,6 +4,7 @@
 
 import java.io.IOException;
 
+import common.ChatIF;
 import ocsf.server.*;
 
 /**
@@ -23,6 +24,13 @@ public class EchoServer extends AbstractServer {
 	 * The default port to listen on.
 	 */
 	final public static int DEFAULT_PORT = 5555;
+	
+	// Instance Variables--------------------------------------------------------------
+	/**
+	 * the interface-type variable that will allow the implementation of 
+	 * the display method in the server
+	 */
+	ChatIF serverUI;
   
 	//Constructors ****************************************************
 	/**
@@ -34,16 +42,29 @@ public class EchoServer extends AbstractServer {
 		super(port);	
 	}
   
-	//Instance methods ************************************************
 	/**
-	 * This method handles any messages received from the client.
-	 *
-	 * @param msg The message received from the client.
-	 * @param client The connection from which the message originated.
+	 * constructor method with ServerConsole object
+	 * 
+	 * @param port
+	 * 	the port number to which this server will connect
+	 * 
+	 * @param serverUI
+	 * 	the ServerConsole that will handle the UI & user-interactions
+	 * 
+	 * @throws IOException
 	 */
-  	public void handleMessageFromClient(Object msg, ConnectionToClient client) {
-  		
-  		// Variable Declaration
+	public EchoServer(int port, ChatIF serverUI) throws IOException {
+		
+		// Initialization
+		super(port);
+		this.serverUI = serverUI;
+		
+	}
+
+	//Instance methods ************************************************
+	public void handleMessageFromEndUser(Object msg) {
+
+		// Variable Declaration
   		String message = (String) msg;
   		
   		// Process: checking if message is a command
@@ -84,17 +105,7 @@ public class EchoServer extends AbstractServer {
 				
 					case "#quit" :
 						
-						try {
-							
-							close(); //closing server & disconnecting all clients
-							
-						}
-						catch (IOException ioe) {
-
-							// Output
-							System.out.println("Could not close server.");
-							
-						}
+						quit(); //quitting server
 						
 						break;
 						
@@ -116,7 +127,7 @@ public class EchoServer extends AbstractServer {
 						
 						try {
 							
-							close(); //closing server & disconnecting all clients
+							close(); //closing server & disconnecting all clients					
 							
 						}
 						catch (IOException ioe) {
@@ -172,13 +183,63 @@ public class EchoServer extends AbstractServer {
 		else { //not command
 			
 			// Output
-			System.out.println("Message received: " + msg + " from " + client);
-	  		
-			// Process: sending message to server
-			this.sendToAllClients(msg);
+			serverUI.display(message);
+			
+			// Process: sending message to all clients
+			sendToAllClients("SERVER MSG> " + message);
 			
 		}
+		
+		
+	}
 	
+	/**
+	 * This method handles any messages received from the client.
+	 *
+	 * @param msg The message received from the client.
+	 * @param client The connection from which the message originated.
+	 */
+  	public void handleMessageFromClient(Object msg, ConnectionToClient client) {
+  		
+  		// Output
+		System.out.println("Message received: " + msg + " from " + client);
+  		
+		// Process: sending message to server
+		this.sendToAllClients(msg);
+	
+  	}
+  	
+  	/**
+	 * this method terminates the server
+	 * it is called when the user types the command #quit
+	 */
+	private void quit() {
+
+		try {
+			
+			close(); //closing server & disconnecting all clients
+			
+		}
+		catch (IOException ioe) {
+
+			// Output
+			System.out.println("Could not close server.");
+			
+		}
+		
+		System.exit(0); //terminating
+		
+	}
+	
+	/**
+  	 * this method overrides the one in the superclass
+  	 * it is called when the server is closed
+  	 */
+  	protected void serverClosed() {
+  		
+  		// Output
+		System.out.println("Server has been closed.");
+  		
   	}
     
   	/**
@@ -207,7 +268,7 @@ public class EchoServer extends AbstractServer {
   	synchronized protected void clientDisconnected(ConnectionToClient client) {
 	  
   		// Output
-  		System.out.println("Client has disconnected :)");
+  		System.out.println("A client has disconnected!");
   		
   	}
 
