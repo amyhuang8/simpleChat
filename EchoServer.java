@@ -201,11 +201,101 @@ public class EchoServer extends AbstractServer {
 	 */
   	public void handleMessageFromClient(Object msg, ConnectionToClient client) {
   		
-  		// Output
-		System.out.println("Message received: " + msg + " from " + client);
+  		// Variable Declaration
+  		String message = (String) msg;
   		
-		// Process: sending message to server
-		this.sendToAllClients(msg);
+  		// Process: checking message length
+  		if (message.length() >= 6) { //could be login command
+	  		
+  			if (message.length() >= 8) { //could be login command
+	  		
+		  		// Process: checking for login command
+		  		if (message.substring(0, 6).equals("#login")) { //login command
+		
+		  			// Process: checking for already logged in
+		  			if (client.getInfo("loginID") == null) { //first time
+		  			
+			  			// Process: setting the client's login ID to the user's input
+			  			client.setInfo("loginID", message.substring(7));
+			  			
+			  			// Output
+						System.out.println("Client " + message.substring(7) +
+								" has connected.");
+						
+						// Process: sending message to clients
+						this.sendToAllClients("Client " + message.substring(7) +
+								" has connected.");
+			  			
+		  			}
+		  			else { //invalid msg bc ID already recorded
+		  				
+		  				// Process: closing the client connection
+		  				try {
+		  					
+							client.close(); //closing
+							
+						}
+		  				catch (IOException ioe) { //error-handling
+							
+		  					// Output
+		  					System.out.println("ERROR - Could not terminate client connection.");
+		  					
+						}
+		  				
+		  			}
+		  			
+		  		}
+		  		else { //echo
+		  		
+			  		// Output
+					System.out.println("Message received: " + msg + " from " + client);
+			  		
+					// Process: sending message to clients
+					this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
+					
+		  		}
+	  			
+	  		}
+  			else {
+  				
+  				if (message.substring(0, 6).equals("#login")) { //checking for incomplete login
+  					
+  					// Process: closing the client connection
+  					try {
+  						
+  					client.close(); //closing
+  					
+  					}
+  					catch (IOException ioe) { //error-handling
+  					
+  						// Output
+  						System.out.println("ERROR - Could not terminate client connection.");
+  						
+  					}
+  					
+  				}
+  				else { //echo
+  					
+  					// Output
+  					System.out.println("Message received: " + msg + " from " + client);
+  			  		
+  					// Process: sending message to clients
+  					this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
+  					
+  				}
+  				
+  			}
+  			
+  		}
+  		else { //echo
+	  		
+	  		// Output
+			System.out.println("Message received: " + msg + " from " + client);
+	  		
+			// Process: sending message to clients
+			this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
+			
+  		}
 	
   	}
   	

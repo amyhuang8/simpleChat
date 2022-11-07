@@ -25,6 +25,11 @@ public class ChatClient extends AbstractClient {
 	 * the display method in the client.
 	 */
 	ChatIF clientUI; 
+	
+	/**
+	 * the login ID of the client
+	 */
+	String loginID;
 
 	//Constructors ****************************************************
 	/**
@@ -34,10 +39,31 @@ public class ChatClient extends AbstractClient {
 	 * @param port The port number to connect on.
 	 * @param clientUI The interface type variable.
 	 */	  
-	public ChatClient(String host, int port, ChatIF clientUI) throws IOException {
+	public ChatClient(String loginID, String host, int port, ChatIF clientUI) throws IOException {
+		
 		super(host, port); //Call the superclass constructor
+		
+		// Initialization
 	    this.clientUI = clientUI;
-	    openConnection();    
+	    
+	    // Process: checking for null user ID
+	    if (loginID == null) {
+	    	
+	    	throw new IOException("no login id provided"); //throwing exception
+	    	
+	    }
+	    else {
+	    	
+	    	// Initialization
+	    	this.loginID = loginID;
+	    	
+	    }
+	    
+	    openConnection(); //opening connection to server
+	    
+	    // Process: sending login message to server
+	    sendToServer("#login " + loginID);
+	    
 	}
 
 	//Instance methods ************************************************
@@ -147,6 +173,21 @@ public class ChatClient extends AbstractClient {
 							
 							// Output
 							clientUI.display("ERROR - Already logged in.");
+							
+							// Process: sending message to server
+							try {
+								
+								sendToServer(message); //sending msg to server
+								
+							}
+							catch(IOException e) {
+								
+								// Output
+								clientUI.display("Could not send message to server.  Terminating client.");
+								
+								quit(); //terminating client connection
+								
+							}
 							
 						}
 						
