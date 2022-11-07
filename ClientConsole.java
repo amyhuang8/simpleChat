@@ -114,6 +114,7 @@ public class ClientConsole implements ChatIF
    * This method is responsible for the creation of the Client UI.
    *
    * @param args[0] The host to connect to.
+   * @param args[1] the port to connect to
    */
   public static void main(String[] args) 
   {
@@ -127,6 +128,7 @@ public class ClientConsole implements ChatIF
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
+    	System.out.println("Connecting to default server.");
       host = "localhost";
       port = DEFAULT_PORT;
     }
