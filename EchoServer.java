@@ -81,6 +81,9 @@ public class EchoServer extends AbstractServer {
 					
 						setPort(Integer.parseInt(message.substring(9))); //setting port
 						
+						// Output
+						System.out.println("port set to: " + getPort());
+						
 					}
 					else { //open server
 						
@@ -119,8 +122,6 @@ public class EchoServer extends AbstractServer {
 						break;
 						
 					case "#close" :
-						
-						stopListening(); //stop listening
 						
 						// Output
 						serverStopped(); //stopping new connections
@@ -219,12 +220,12 @@ public class EchoServer extends AbstractServer {
 			  			client.setInfo("loginID", message.substring(7));
 			  			
 			  			// Output
-						System.out.println("Client " + message.substring(7) +
-								" has connected.");
+			  			System.out.println("A new client is attempting to connect to the server.");
+			  			System.out.println(message.substring(7) + " has logged on.");
+			  			System.out.println("Message received: #login " + message.substring(7) + " from " + client);
 						
 						// Process: sending message to clients
-						this.sendToAllClients("Client " + message.substring(7) +
-								" has connected.");
+						this.sendToAllClients(message.substring(7) + " has logged on.");
 			  			
 		  			}
 		  			else { //invalid msg bc ID already recorded
@@ -248,7 +249,7 @@ public class EchoServer extends AbstractServer {
 		  		else { //echo
 		  		
 			  		// Output
-					System.out.println("Message received: " + msg + " from " + client);
+					System.out.println("Message received: " + msg + " from " + client.getInfo("loginID"));
 			  		
 					// Process: sending message to clients
 					this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
@@ -277,7 +278,7 @@ public class EchoServer extends AbstractServer {
   				else { //echo
   					
   					// Output
-  					System.out.println("Message received: " + msg + " from " + client);
+  					System.out.println("Message received: " + msg + " from " + client.getInfo("loginID"));
   			  		
   					// Process: sending message to clients
   					this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
@@ -290,7 +291,7 @@ public class EchoServer extends AbstractServer {
   		else { //echo
 	  		
 	  		// Output
-			System.out.println("Message received: " + msg + " from " + client);
+  			System.out.println("Message received: " + msg + " from " + client.getInfo("loginID"));
 	  		
 			// Process: sending message to clients
 			this.sendToAllClients(client.getInfo("loginID") + "> " + msg);
@@ -358,7 +359,7 @@ public class EchoServer extends AbstractServer {
   	synchronized protected void clientDisconnected(ConnectionToClient client) {
 	  
   		// Output
-  		System.out.println("A client has disconnected!");
+  		System.out.println(client.getInfo("loginID") + " has disconnected!");
   		
   	}
 

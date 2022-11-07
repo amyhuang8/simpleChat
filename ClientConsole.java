@@ -60,13 +60,10 @@ public class ClientConsole implements ChatIF {
 			// Process: checking for no login ID
 			if (exception.getMessage().equals("no login id provided")) { //no login id
     		
-    		// Output
-    		System.out.println("No login ID provided!");
+	    		// Output
+	    		System.out.println("ERROR - No login ID specified.  Connection aborted.");
     		
 			}
-		
-			System.out.println("Error: Can't setup connection!"
-					+ " Terminating client.");
 			
 			System.exit(1);
     

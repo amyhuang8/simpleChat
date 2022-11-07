@@ -20,9 +20,9 @@ public class ServerConsole implements ChatIF {
 	 */
 	Scanner fromConsole;
 	
-	// Constructor Method--------------------------------------------------------------
+	// Constructor Methods--------------------------------------------------------------
 	/**
-	 * this constructor method
+	 * constructor method
 	 * 
 	 * @param port
 	 * 	the port on which the server will listen
@@ -110,7 +110,7 @@ public class ServerConsole implements ChatIF {
 		 * should be prefixed by the string "SERVER MSG>". */
 		
 		// Output
-		System.out.println("SERVER MSG> " + message);
+		System.out.println("SERVER MESSAGE> " + message);
 		
 	}
 	
